@@ -16,4 +16,18 @@ class AuthenticationManager with ChangeNotifier {
     print("TOGGLE " + _isLoggedIn.toString());
     preference.setBool("isLoggedIn", _isLoggedIn);
   }
+
+  loggedInTrue() async {
+    _isLoggedIn = true;
+    var preference = await SharedPreferences.getInstance();
+    print("TOGGLE " + _isLoggedIn.toString());
+    preference.setBool("isLoggedIn", _isLoggedIn);
+  }
+
+  loggedInFalse() async {
+    _isLoggedIn = false;
+    var preference = await SharedPreferences.getInstance();
+    print("TOGGLE " + _isLoggedIn.toString());
+    preference.setBool("isLoggedIn", _isLoggedIn);
+  }
 }

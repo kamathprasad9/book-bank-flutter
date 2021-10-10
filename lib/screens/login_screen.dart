@@ -9,8 +9,6 @@ import '../constants.dart';
 import '../providers/authentication_manager.dart';
 //widgets
 import '../widgets/rounded_button.dart';
-//screens
-import 'welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = 'login_screen';
@@ -83,16 +81,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         email: email, password: password);
                     if (user != null) {
                       Provider.of<AuthenticationManager>(context, listen: false)
-                          .toggleLogin();
+                          .loggedInTrue();
                       // await Navigator.pushAndRemoveUntil(
                       //   context,
                       //   MaterialPageRoute(
                       //       builder: (context) => WelcomeScreen()),
                       //   ModalRoute.withName(WelcomeScreen.routeName),
                       // );
-                     Navigator.pop(context);
-                     Navigator.pop(context);
-                     Navigator.pushNamed(context, HomePage.routeName);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, HomePage.routeName);
                     }
                   } catch (e) {
                     print(e);

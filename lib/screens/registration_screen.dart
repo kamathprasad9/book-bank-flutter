@@ -78,6 +78,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     final newUser = await _auth.createUserWithEmailAndPassword(
                         email: email, password: password);
                     if (newUser != null) {
+                      Navigator.pop(context);
                       Navigator.pushNamed(context, LoginScreen.routeName);
                     }
 

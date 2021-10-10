@@ -26,7 +26,7 @@ class _AppDrawerState extends State<AppDrawer> {
               onPressed: () {
                 if (isLoggedIn) {
                   Provider.of<AuthenticationManager>(context, listen: false)
-                      .toggleLogin();
+                      .loggedInFalse();
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => WelcomeScreen()),
