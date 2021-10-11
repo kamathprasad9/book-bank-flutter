@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
 
+enum RadioButtonType { donate, slider }
+
 class AddBook extends StatefulWidget {
   @override
   _AddBookState createState() => _AddBookState();
@@ -10,8 +12,11 @@ class AddBook extends StatefulWidget {
 
 class _AddBookState extends State<AddBook> {
   final GlobalKey<FormState> _formKey = GlobalKey();
+
+  RadioButtonType _radioButtonType = RadioButtonType.donate;
   LocationData _currentPosition;
-  String _area, _city;
+  String _bookName, _author, _description, _area, _city, _mrp;
+  double _percent = 4.0 / 100;
   DateTime _dateTime;
   Location location = Location();
 
@@ -23,7 +28,7 @@ class _AddBookState extends State<AddBook> {
 
   void _submit() async {
     // getLoc();
-    print(_dateTime);
+    print("$_bookName+$_author+$_description+$_area+$_city+$_mrp");
     final isValid = _formKey.currentState.validate();
     if (!isValid) {
       return;
@@ -55,6 +60,11 @@ class _AddBookState extends State<AddBook> {
                   }
                   return null;
                 },
+                onChanged: (value) {
+                  setState(() {
+                    _bookName = value;
+                  });
+                },
               ),
             ),
             Container(
@@ -71,6 +81,11 @@ class _AddBookState extends State<AddBook> {
                     return "Required";
                   }
                   return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _author = value;
+                  });
                 },
               ),
             ),
@@ -90,8 +105,111 @@ class _AddBookState extends State<AddBook> {
                   }
                   return null;
                 },
+                onChanged: (value) {
+                  setState(() {
+                    _description = value;
+                  });
+                },
               ),
             ),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  hintText: '255',
+                  labelText: "MRP (in Rs)",
+                  border: OutlineInputBorder(),
+                ),
+                enableSuggestions: true,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return "Required";
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _mrp = value;
+                  });
+                },
+              ),
+            ),
+            if (_mrp != null)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text('Type'),
+                  SizedBox(
+                    width: 300,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Flexible(
+                          child: ListTile(
+                            title: const Text('Donate'),
+                            leading: Radio<RadioButtonType>(
+                              value: RadioButtonType.donate,
+                              groupValue: _radioButtonType,
+                              onChanged: (RadioButtonType value) {
+                                setState(() {
+                                  _radioButtonType = value;
+                                  print(_radioButtonType);
+                                  _percent = 0;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          child: Column(
+                            children: [
+                              ListTile(
+                                title: SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    inactiveTickMarkColor: Colors.amber,
+                                  ),
+                                  child: Slider(
+                                    value: _percent,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _percent = value;
+                                        print(_percent);
+                                      });
+                                    },
+                                    min: 0,
+                                    max: 20,
+                                    divisions: 20,
+                                    label: "${_percent.round()}",
+                                  ),
+                                ),
+                                leading: Radio<RadioButtonType>(
+                                  value: RadioButtonType.slider,
+                                  groupValue: _radioButtonType,
+                                  onChanged: (RadioButtonType value) {
+                                    setState(() {
+                                      _radioButtonType = value;
+                                      print(_radioButtonType);
+                                    });
+                                  },
+                                ),
+                              ),
+                              if (_radioButtonType == RadioButtonType.slider)
+                                Container(
+                                  padding: EdgeInsets.only(left: 70),
+                                  child: Text(
+                                      '${_percent.round()}% of Rs. $_mrp = Rs. ${(double.parse(_mrp) * _percent / 100).round()}'),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             if (_area != null)
               Container(
                 padding: EdgeInsets.all(10),
@@ -108,6 +226,11 @@ class _AddBookState extends State<AddBook> {
                       return "Required";
                     }
                     return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      _area = value;
+                    });
                   },
                 ),
               ),
@@ -127,6 +250,11 @@ class _AddBookState extends State<AddBook> {
                       return "Required";
                     }
                     return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      _city = value;
+                    });
                   },
                 ),
               ),
@@ -179,8 +307,8 @@ class _AddBookState extends State<AddBook> {
             setState(() {
               print(value.first.locality); //city
               print(value.first.subLocality); //area
-              _area = "${value.first.subLocality}";
-              _city = '${value.first.locality}';
+              _area = _area ?? "${value.first.subLocality}";
+              _city = _city ?? '${value.first.locality}';
             });
           });
         });
