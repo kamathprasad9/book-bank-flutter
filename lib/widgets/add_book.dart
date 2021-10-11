@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 
 enum RadioButtonType { donate, slider }
@@ -12,6 +15,7 @@ class AddBook extends StatefulWidget {
 
 class _AddBookState extends State<AddBook> {
   final GlobalKey<FormState> _formKey = GlobalKey();
+  bool imageExists = true;
 
   RadioButtonType _radioButtonType = RadioButtonType.donate;
   LocationData _currentPosition;
@@ -30,7 +34,13 @@ class _AddBookState extends State<AddBook> {
     // getLoc();
     print("$_bookName+$_author+$_description+$_area+$_city+$_mrp");
     final isValid = _formKey.currentState.validate();
-    if (!isValid) {
+    setState(() {
+      if (_images.length > 0)
+        imageExists = true;
+      else
+        imageExists = false;
+    });
+    if (!isValid || !imageExists) {
       return;
     }
     _formKey.currentState.save();
@@ -43,6 +53,7 @@ class _AddBookState extends State<AddBook> {
       child: SingleChildScrollView(
         child: Column(
           // mainAxisSize: MainAxisSize.min,
+
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
@@ -176,7 +187,6 @@ class _AddBookState extends State<AddBook> {
                                     onChanged: (value) {
                                       setState(() {
                                         _percent = value;
-                                        print(_percent);
                                       });
                                     },
                                     min: 0,
@@ -209,6 +219,91 @@ class _AddBookState extends State<AddBook> {
                     ),
                   ),
                 ],
+              ),
+            Container(
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border:
+                    Border.all(color: imageExists ? Colors.grey : Colors.red),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Text('Upload Photo(s)'),
+                        RawMaterialButton(
+                          fillColor: Theme.of(context).colorScheme.secondary,
+                          child: Icon(
+                            Icons.add_photo_alternate_rounded,
+                            color: Colors.white,
+                          ),
+                          elevation: 8,
+                          onPressed: () {
+                            getImage(true);
+                          },
+                          padding: EdgeInsets.all(15),
+                          shape: CircleBorder(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_images.length > 0)
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      width: MediaQuery.of(context).size.width,
+                      child: Container(
+                        child: ListView.builder(
+                          physics: ClampingScrollPhysics(),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _images.length,
+                          itemBuilder: (BuildContext context, int index) =>
+                              Container(
+                            margin: EdgeInsets.all(8),
+                            height: MediaQuery.of(context).size.height * 0.25,
+                            width: MediaQuery.of(context).size.width * 0.33,
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _images.removeAt(index);
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.cancel,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: FileImage(_images[index]),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (!imageExists)
+              Text(
+                'Add at least one image',
+                textAlign: TextAlign.left,
+                style: TextStyle(color: Colors.red),
               ),
             if (_area != null)
               Container(
@@ -260,7 +355,7 @@ class _AddBookState extends State<AddBook> {
               ),
             ElevatedButton(
               child: Text(
-                "Submit",
+                "Post Ad",
                 style: TextStyle(
                   fontSize: 24.0,
                 ),
@@ -321,5 +416,34 @@ class _AddBookState extends State<AddBook> {
     List<Address> add =
         await Geocoder.local.findAddressesFromCoordinates(coordinates);
     return add;
+  }
+
+  // Image Picker
+  List<File> _images = [];
+
+  Future getImage(bool gallery) async {
+    ImagePicker picker = ImagePicker();
+    PickedFile pickedFile;
+    // Let user select photo from gallery
+    if (gallery) {
+      pickedFile = await picker.getImage(
+        source: ImageSource.gallery,
+      );
+    }
+    // Otherwise open camera to get new photo
+    else {
+      pickedFile = await picker.getImage(
+        source: ImageSource.camera,
+      );
+    }
+
+    setState(() {
+      if (pickedFile != null) {
+        _images.add(File(pickedFile.path));
+        //_image = File(pickedFile.path); // Use if you only need a single picture
+      } else {
+        print('No image selected.');
+      }
+    });
   }
 }
