@@ -6,6 +6,9 @@ import 'package:geocoder/geocoder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 
+//services
+import '../services/firebase_service.dart';
+
 enum RadioButtonType { donate, slider }
 
 class AddBook extends StatefulWidget {
@@ -16,10 +19,11 @@ class AddBook extends StatefulWidget {
 class _AddBookState extends State<AddBook> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   bool imageExists = true;
+  bool isLoading = false;
 
   RadioButtonType _radioButtonType = RadioButtonType.donate;
   LocationData _currentPosition;
-  String _bookName, _author, _description, _area, _city, _mrp;
+  String _bookName, _authorName, _description, _area, _city, _mrp;
   double _percent = 4.0 / 100;
   DateTime _dateTime;
   Location location = Location();
@@ -32,7 +36,7 @@ class _AddBookState extends State<AddBook> {
 
   void _submit() async {
     // getLoc();
-    print("$_bookName+$_author+$_description+$_area+$_city+$_mrp");
+    print("$_bookName+$_authorName+$_description+$_area+$_city+$_mrp");
     final isValid = _formKey.currentState.validate();
     setState(() {
       if (_images.length > 0)
@@ -44,6 +48,31 @@ class _AddBookState extends State<AddBook> {
       return;
     }
     _formKey.currentState.save();
+    setState(() {
+      isLoading = true;
+      print("$isLoading isLoading");
+    });
+    FirebaseService firebaseService = FirebaseService();
+
+    await firebaseService.postAdvertisement(<dynamic, dynamic>{
+      "bookName": _bookName,
+      "authorName": _authorName,
+      "description": _description,
+      "mrp": _mrp,
+      "percentOfMRP": _radioButtonType == RadioButtonType.donate
+          ? '0'
+          : _percent.toString(),
+      "area": _area,
+      "city": _city,
+      "dateOfAdvertisement": _dateTime,
+      "images": _images,
+    });
+
+    // Future.delayed(Duration(seconds: 2));
+    setState(() {
+      isLoading = false;
+      print("$isLoading isLoading");
+    });
   }
 
   @override
@@ -95,7 +124,7 @@ class _AddBookState extends State<AddBook> {
                 },
                 onChanged: (value) {
                   setState(() {
-                    _author = value;
+                    _authorName = value;
                   });
                 },
               ),
@@ -353,15 +382,35 @@ class _AddBookState extends State<AddBook> {
                   },
                 ),
               ),
-            ElevatedButton(
-              child: Text(
-                "Post Ad",
-                style: TextStyle(
-                  fontSize: 24.0,
-                ),
-              ),
-              onPressed: () => _submit(),
-            )
+            isLoading
+                ? ElevatedButton(
+                    onPressed: () {},
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: 100,
+                      height: 50,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                : ElevatedButton(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: 150,
+                      height: 50,
+                      child: Text(
+                        isLoading ? 'Loading' : 'Post Ad',
+                        style: TextStyle(fontSize: 25),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    onPressed: () {
+                      _submit();
+                    },
+                  )
           ],
         ),
       ),

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 import '../widgets/add_book.dart';
-//widgets
 import '../widgets/app_drawer.dart';
+//widgets
+import '../widgets/browse_books.dart';
 
 class HomePage extends StatefulWidget {
   static String routeName = 'home_page';
@@ -31,10 +32,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      // style: optionStyle,
-    ),
+    BrowseBooks(),
     AddBook(),
     Text(
       'Index 2: School',

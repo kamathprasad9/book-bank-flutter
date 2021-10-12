@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 //providers
 import './providers/authentication_manager.dart';
+import './providers/books_manager.dart';
 //screens
 import './screens/home_page.dart';
 import './screens/login_screen.dart';
@@ -24,7 +25,10 @@ void main() async {
           create: (_) => AuthenticationManager(
             isLoggedIn,
           ),
-        )
+        ),
+        ChangeNotifierProvider<BooksManager>(
+          create: (_) => BooksManager(),
+        ),
       ],
       child: BookBank(
         isLoggedIn: isLoggedIn,
