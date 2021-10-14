@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 import '../widgets/add_book.dart';
 import '../widgets/app_drawer.dart';
@@ -34,10 +33,10 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _widgetOptions = <Widget>[
     BrowseBooks(),
     AddBook(),
-    Text(
-      'Index 2: School',
-      // style: optionStyle,
-    ),
+    // Text(
+    //   'Index 2: School',
+    //   // style: optionStyle,
+    // ),
   ];
 
   @override
@@ -47,37 +46,24 @@ class _HomePageState extends State<HomePage> {
         title: Text('Home'),
       ),
       drawer: AppDrawer(),
-      bottomNavigationBar: SalomonBottomBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
         items: [
           /// Home
-          SalomonBottomBarItem(
+
+          BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text("Home"),
-            selectedColor: Colors.purple,
+            label: "Home",
+            // selectedColor: Colors.purple,
           ),
 
           /// Likes
-          SalomonBottomBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.add),
-            title: Text("Add"),
-            selectedColor: Colors.pink,
+            label: "Add",
+            // selectedColor: Colors.pink,
           ),
-
-          /// Search
-          SalomonBottomBarItem(
-            icon: Icon(Icons.search),
-            title: Text("Search"),
-            selectedColor: Colors.orange,
-          ),
-
-          /// Profile
-          // SalomonBottomBarItem(
-          //   icon: Icon(Icons.person),
-          //   title: Text("Profile"),
-          //   selectedColor: Colors.teal,
-          // ),
         ],
       ),
       body: Container(

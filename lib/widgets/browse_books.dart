@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../models/book.dart';
 //providers
 import '../providers/books_manager.dart';
+//screens
+import '../screens/book_details.dart';
 
 class BrowseBooks extends StatefulWidget {
   @override
@@ -86,72 +88,83 @@ class _BrowseBooksState extends State<BrowseBooks> {
                       print(book.images);
                       Future<String> imageUrl = getUrl(book.images[0]);
                       print("toast $imageUrl");
-                      return Container(
-                          child: Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.all(10),
-                            height: 100,
-                            child: imageUrl != null
-                                ? FutureBuilder(
-                                    future: getUrl(book.images[0]),
-                                    builder: (BuildContext context, snapshot) {
-                                      switch (snapshot.connectionState) {
-                                        case ConnectionState.waiting:
-                                          return Center(
-                                              child:
-                                                  CircularProgressIndicator());
-                                        default:
-                                          if (snapshot.hasError)
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      BookDetails(bookDetails: book)));
+                        },
+                        child: Container(
+                            child: Row(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(10),
+                              height: 100,
+                              child: imageUrl != null
+                                  ? FutureBuilder(
+                                      future: getUrl(book.images[0]),
+                                      builder:
+                                          (BuildContext context, snapshot) {
+                                        switch (snapshot.connectionState) {
+                                          case ConnectionState.waiting:
                                             return Center(
-                                                child: Icon(Icons.error));
-                                          else
-                                            return Image.network(snapshot.data);
-                                      }
-                                    },
-                                  )
-                                : Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(book.bookName),
-                              Text("Author: " + book.authorName),
-                              Row(
-                                children: [
-                                  Text("MRP: Rs. " + book.mrp),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text("|"),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(book.percentOfMRP != '0'
-                                      ? "User Price: Rs. " +
-                                          (double.parse(book.percentOfMRP) *
-                                                  double.parse(book.mrp))
-                                              .round()
-                                              .toString()
-                                      : "Available for free!"),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.pin_drop_outlined,
-                                    color: Colors.grey,
-                                  ),
-                                  Text(book.area + ", "),
-                                  Text(book.city),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ));
+                                                child:
+                                                    CircularProgressIndicator());
+                                          default:
+                                            if (snapshot.hasError)
+                                              return Center(
+                                                  child: Icon(Icons.error));
+                                            else
+                                              return Image.network(
+                                                  snapshot.data);
+                                        }
+                                      },
+                                    )
+                                  : Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(book.bookName),
+                                Text("Author: " + book.authorName),
+                                Row(
+                                  children: [
+                                    Text("MRP: Rs. " + book.mrp),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text("|"),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(book.percentOfMRP != '0'
+                                        ? "User Price: Rs. " +
+                                            (double.parse(book.percentOfMRP) *
+                                                    double.parse(book.mrp))
+                                                .round()
+                                                .toString()
+                                        : "Available for free!"),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.pin_drop_outlined,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(book.area + ", "),
+                                    Text(book.city),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        )),
+                      );
                     }),
               );
             });
