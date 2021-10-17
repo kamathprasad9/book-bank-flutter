@@ -85,8 +85,8 @@ class _BrowseBooksState extends State<BrowseBooks> {
                         : 0,
                     itemBuilder: (context, index) {
                       Book book = books[index];
-                      print(book.images);
-                      Future<String> imageUrl = getUrl(book.images[0]);
+                      print(book.image);
+                      Future<String> imageUrl = getUrl(book.image);
                       print("toast $imageUrl");
                       return GestureDetector(
                         onTap: () {
@@ -104,7 +104,7 @@ class _BrowseBooksState extends State<BrowseBooks> {
                               height: 100,
                               child: imageUrl != null
                                   ? FutureBuilder(
-                                      future: getUrl(book.images[0]),
+                                      future: getUrl(book.image),
                                       builder:
                                           (BuildContext context, snapshot) {
                                         switch (snapshot.connectionState) {
@@ -175,8 +175,9 @@ class _BrowseBooksState extends State<BrowseBooks> {
   }
 
   Future<String> getUrl(String image) async {
+    print("posi: $image");
     final String downloadURL =
-        await FirebaseStorage.instance.ref(image).getDownloadURL();
+        await FirebaseStorage.instance.ref("books/$image").getDownloadURL();
     // print(downloadURL);
     return downloadURL;
   }

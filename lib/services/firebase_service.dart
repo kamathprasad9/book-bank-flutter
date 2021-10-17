@@ -2,11 +2,9 @@ import 'dart:io';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart' as Path;
 
 class FirebaseService {
   Future<void> postAdvertisement(Map<dynamic, dynamic> jsonData) async {
-    List<File> images = jsonData["images"];
     try {
       final database = FirebaseDatabase.instance.reference();
       print("fetch data: $database");
@@ -25,6 +23,7 @@ class FirebaseService {
           id = 0.toString();
           // _books = null;
         }
+        uploadFile(jsonData['image'], id);
 
         FirebaseDatabase.instance
             .reference()
@@ -40,8 +39,7 @@ class FirebaseService {
           "area": jsonData['area'],
           "city": jsonData['city'],
           "dateOfAdvertisement": jsonData['dateOfAdvertisement'].toString(),
-          "images": preUpload(images, id)
-          // "images": imagesList,
+          "image": id.toString()
         });
       });
     } catch (error) {
@@ -49,20 +47,19 @@ class FirebaseService {
     }
   }
 
-  List<String> preUpload(List<File> images, String id) {
-    List<String> imageList = [];
-    images.forEach((image) async {
-      imageList.add('books/$id/${Path.basename(image.path)}');
-      String imageURL = await uploadFile(image, id);
-    });
-    // print(imageList);
-    return imageList;
-  }
+  // List<String> preUpload(List<File> images, String id) {
+  //   List<String> imageList = [];
+  //   images.forEach((image) async {
+  //     imageList.add('books/$id/${Path.basename(image.path)}');
+  //     String imageURL = await uploadFile(image, id);
+  //   });
+  //   // print(imageList);
+  //   return imageList;
+  // }
 
   Future<String> uploadFile(File image, String id) async {
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('books/$id/${Path.basename(image.path)}');
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('books/$id');
     await storageReference.putFile(image).then((p0) => print("File Uploaded"));
 
     String returnURL;

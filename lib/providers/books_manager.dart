@@ -25,11 +25,11 @@ class BooksManager with ChangeNotifier {
           if (extractedData != null) {
             print(extractedData);
             extractedData.forEach((imageData) async {
-              var imagePaths = imageData["images"];
-              List<String> imagesURL = await downloadURLs(imagePaths);
+              var imagePaths = imageData["image"];
+              String imageURL = await downloadURL(imagePaths);
               // print(
               //     "bugDE: ${downloadURLs(imagePaths).then((value) => value)}");
-              _books.add(Book.fromJson(imageData, imagesURL));
+              _books.add(Book.fromJson(imageData, imageURL));
             });
           }
         } else {
@@ -43,18 +43,14 @@ class BooksManager with ChangeNotifier {
     }
   }
 
-  Future<List<String>> downloadURLs(var images) async {
-    List<String> imagesURL = [];
-    await images.forEach((image) async {
-      String downloadURL =
-          await FirebaseStorage.instance.ref(image).getDownloadURL();
-      // print(downloadURL);
-      imagesURL.add(downloadURL);
+  Future<String> downloadURL(String image) async {
+    print("imagesURL $image");
+    String downloadURL =
+        await FirebaseStorage.instance.ref("books/$image").getDownloadURL();
 
-      // print("imagesURL $imagesURL");
+    print("imagesURL $downloadURL");
 
-      notifyListeners();
-      return imagesURL;
-    });
+    notifyListeners();
+    return downloadURL;
   }
 }

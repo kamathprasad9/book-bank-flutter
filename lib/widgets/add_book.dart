@@ -39,7 +39,7 @@ class _AddBookState extends State<AddBook> {
     print("$_bookName+$_authorName+$_description+$_area+$_city+$_mrp");
     final isValid = _formKey.currentState.validate();
     setState(() {
-      if (_images.length > 0)
+      if (_image != null)
         imageExists = true;
       else
         imageExists = false;
@@ -65,7 +65,7 @@ class _AddBookState extends State<AddBook> {
       "area": _area,
       "city": _city,
       "dateOfAdvertisement": _dateTime,
-      "images": _images,
+      "image": _image,
     });
 
     // Future.delayed(Duration(seconds: 2));
@@ -263,64 +263,56 @@ class _AddBookState extends State<AddBook> {
                     padding: EdgeInsets.all(8),
                     child: Row(
                       children: [
-                        Text('Upload Photo(s)'),
-                        RawMaterialButton(
-                          fillColor: Theme.of(context).colorScheme.secondary,
-                          child: Icon(
-                            Icons.add_photo_alternate_rounded,
-                            color: Colors.white,
+                        Text('Upload Photo'),
+                        if (_image == null)
+                          RawMaterialButton(
+                            fillColor: Theme.of(context).colorScheme.secondary,
+                            child: Icon(
+                              Icons.add_photo_alternate_rounded,
+                              color: Colors.white,
+                            ),
+                            elevation: 8,
+                            onPressed: () {
+                              getImage(true);
+                            },
+                            padding: EdgeInsets.all(15),
+                            shape: CircleBorder(),
                           ),
-                          elevation: 8,
-                          onPressed: () {
-                            getImage(true);
-                          },
-                          padding: EdgeInsets.all(15),
-                          shape: CircleBorder(),
-                        ),
                       ],
                     ),
                   ),
-                  if (_images.length > 0)
+                  if (_image != null)
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.3,
                       width: MediaQuery.of(context).size.width,
                       child: Container(
-                        child: ListView.builder(
-                          physics: ClampingScrollPhysics(),
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _images.length,
-                          itemBuilder: (BuildContext context, int index) =>
-                              Container(
-                            margin: EdgeInsets.all(8),
-                            height: MediaQuery.of(context).size.height * 0.25,
-                            width: MediaQuery.of(context).size.width * 0.33,
-                            child: Align(
-                              alignment: Alignment.topRight,
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _images.removeAt(index);
-                                    });
-                                  },
-                                  child: Icon(
-                                    Icons.cancel,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
+                        margin: EdgeInsets.all(8),
+                        height: MediaQuery.of(context).size.height * 0.25,
+                        width: MediaQuery.of(context).size.width * 0.33,
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: FileImage(_images[index]),
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _image = null;
+                                });
+                              },
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.white,
                               ),
                             ),
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(_image),
                           ),
                         ),
                       ),
@@ -330,7 +322,7 @@ class _AddBookState extends State<AddBook> {
             ),
             if (!imageExists)
               Text(
-                'Add at least one image',
+                'Add a image',
                 textAlign: TextAlign.left,
                 style: TextStyle(color: Colors.red),
               ),
@@ -468,7 +460,7 @@ class _AddBookState extends State<AddBook> {
   }
 
   // Image Picker
-  List<File> _images = [];
+  File _image;
 
   Future getImage(bool gallery) async {
     ImagePicker picker = ImagePicker();
@@ -488,8 +480,8 @@ class _AddBookState extends State<AddBook> {
 
     setState(() {
       if (pickedFile != null) {
-        _images.add(File(pickedFile.path));
-        //_image = File(pickedFile.path); // Use if you only need a single picture
+        // _images.add(File(pickedFile.path));
+        _image = File(pickedFile.path); // Use if you only need a single picture
       } else {
         print('No image selected.');
       }

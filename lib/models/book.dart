@@ -10,7 +10,7 @@ class Book {
       city,
       percentOfMRP,
       dateOfAdvertisement;
-  List<String> images;
+  String image;
 
   Book({
     @required this.id,
@@ -22,10 +22,10 @@ class Book {
     @required this.area,
     @required this.city,
     @required this.dateOfAdvertisement,
-    @required this.images,
+    @required this.image,
   });
 
-  factory Book.fromJson(var jsonData, List<String> imagesURL) {
+  factory Book.fromJson(var jsonData, String imageURL) {
     List extractedData = jsonData['images'] as List;
     print(extractedData);
     return Book(
@@ -38,11 +38,7 @@ class Book {
       area: jsonData['area'],
       city: jsonData['city'],
       dateOfAdvertisement: jsonData['dateOfAdvertisement'],
-      images: extractedData.map((e) {
-        // print("Debug $e");
-        // print(e);
-        return e.toString();
-      }).toList(),
+      image: jsonData['image'],
     );
   }
 }

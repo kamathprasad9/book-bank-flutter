@@ -1,4 +1,3 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +35,8 @@ class _BookDetailsState extends State<BookDetails> {
         child: Column(
           children: [
             FutureBuilder(
-              future: getUrl(book.images),
+              future: Provider.of<BooksManager>(context, listen: false)
+                  .downloadURL(book.image),
               builder: (BuildContext context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
@@ -44,16 +44,9 @@ class _BookDetailsState extends State<BookDetails> {
                   default:
                     if (snapshot.hasError) {
                       return Center(child: Icon(Icons.error));
-                    }
-                    // else if (snapshot.data) {
-                    //   return Center(
-                    //     child: CircularProgressIndicator(),
-                    //   );
-                    // }
-                    else {
-                      print('inside');
+                    } else {
                       return snapshot.data.length > 0
-                          ? Image.network(snapshot.data[0])
+                          ? Image.network(snapshot.data)
                           : Center(
                               child: CircularProgressIndicator(),
                             );
@@ -79,18 +72,5 @@ class _BookDetailsState extends State<BookDetails> {
         ),
       ),
     );
-  }
-
-  Future<List<String>> getUrl(List<String> images) async {
-    List<String> imagesUrl = [];
-    images.forEach((image) async {
-      final String downloadURL =
-          await FirebaseStorage.instance.ref(image).getDownloadURL();
-      imagesUrl.add(downloadURL);
-    });
-
-    // print(downloadURL);
-    print('returning');
-    return imagesUrl;
   }
 }
