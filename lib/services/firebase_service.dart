@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../services/local_notification.dart';
+
 class FirebaseService {
   Future<void> postAdvertisement(Map<dynamic, dynamic> jsonData) async {
     try {
@@ -40,6 +42,12 @@ class FirebaseService {
           "city": jsonData['city'],
           "dateOfAdvertisement": jsonData['dateOfAdvertisement'].toString(),
           "image": id.toString()
+        }).then((value) {
+          LocalNotification.showNotification(
+            title: 'Your ad is not live!',
+            body:
+                'Your advertisement for the book ${jsonData['bookName']} is posted',
+          );
         });
       });
     } catch (error) {
