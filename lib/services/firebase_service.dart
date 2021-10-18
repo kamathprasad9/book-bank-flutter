@@ -20,7 +20,7 @@ class FirebaseService {
           final extractedData = snapshot.value['booksArray'] as List;
           print("extracted $extractedData");
           print(extractedData);
-          id = extractedData.length.toString();
+          id = extractedData != null ? extractedData.length.toString() : '0';
         } else {
           id = 0.toString();
           // _books = null;
@@ -41,7 +41,10 @@ class FirebaseService {
           "area": jsonData['area'],
           "city": jsonData['city'],
           "dateOfAdvertisement": jsonData['dateOfAdvertisement'].toString(),
-          "image": id.toString()
+          "image": id.toString(),
+          "latitude": jsonData['latitude'],
+          "longitude": jsonData['longitude'],
+          "ownerEmail": jsonData['ownerEmail']
         }).then((value) {
           LocalNotification.showNotification(
             title: 'Your ad is not live!',
@@ -54,16 +57,6 @@ class FirebaseService {
       throw "no content";
     }
   }
-
-  // List<String> preUpload(List<File> images, String id) {
-  //   List<String> imageList = [];
-  //   images.forEach((image) async {
-  //     imageList.add('books/$id/${Path.basename(image.path)}');
-  //     String imageURL = await uploadFile(image, id);
-  //   });
-  //   // print(imageList);
-  //   return imageList;
-  // }
 
   Future<String> uploadFile(File image, String id) async {
     Reference storageReference =

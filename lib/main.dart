@@ -11,7 +11,6 @@ import './providers/books_manager.dart';
 import './screens/home_page.dart';
 import './screens/login_screen.dart';
 import './screens/registration_screen.dart';
-import './screens/welcome_screen.dart';
 
 final _localNotifications = FlutterLocalNotificationsPlugin();
 
@@ -44,6 +43,14 @@ void main() async {
         ChangeNotifierProvider<BooksManager>(
           create: (_) => BooksManager(),
         ),
+        ChangeNotifierProxyProvider<AuthenticationManager, BooksManager>(
+          create: (_) => BooksManager(),
+          update: (_,
+                  // AuthManager authManager,
+                  AuthenticationManager authenticationManager,
+                  BooksManager booksManager) =>
+              booksManager..authenticationManager = authenticationManager,
+        ),
       ],
       child: BookBank(
         isLoggedIn: isLoggedIn,
@@ -59,9 +66,9 @@ class BookBank extends StatelessWidget {
   Widget build(BuildContext context) {
     print("value " + isLoggedIn.toString());
     return MaterialApp(
-      initialRoute: isLoggedIn ? HomePage.routeName : WelcomeScreen.routeName,
+      initialRoute: isLoggedIn ? HomePage.routeName : LoginScreen.routeName,
       routes: {
-        WelcomeScreen.routeName: (context) => WelcomeScreen(),
+        // WelcomeScreen.routeName: (context) => WelcomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
         RegistrationScreen.routeName: (context) => RegistrationScreen(),
         HomePage.routeName: (context) => HomePage(),

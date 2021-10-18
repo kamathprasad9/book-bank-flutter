@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:book_bank/providers/authentication_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 
 //services
 import '../services/firebase_service.dart';
@@ -54,6 +56,9 @@ class _AddBookState extends State<AddBook> {
     });
     FirebaseService firebaseService = FirebaseService();
 
+    print(Provider.of<AuthenticationManager>(context, listen: false).email +
+        "email");
+
     await firebaseService.postAdvertisement(<dynamic, dynamic>{
       "bookName": _bookName,
       "authorName": _authorName,
@@ -66,6 +71,10 @@ class _AddBookState extends State<AddBook> {
       "city": _city,
       "dateOfAdvertisement": _dateTime,
       "image": _image,
+      "latitude": _currentPosition.latitude.toString(),
+      "longitude": _currentPosition.longitude.toString(),
+      "ownerEmail":
+          Provider.of<AuthenticationManager>(context, listen: false).email
     });
 
     // Future.delayed(Duration(seconds: 2));
@@ -467,12 +476,14 @@ class _AddBookState extends State<AddBook> {
     PickedFile pickedFile;
     // Let user select photo from gallery
     if (gallery) {
+      // ignore: deprecated_member_use
       pickedFile = await picker.getImage(
         source: ImageSource.gallery,
       );
     }
     // Otherwise open camera to get new photo
     else {
+      // ignore: deprecated_member_use
       pickedFile = await picker.getImage(
         source: ImageSource.camera,
       );

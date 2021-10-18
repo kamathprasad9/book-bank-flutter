@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 //providers
 import '../providers/authentication_manager.dart';
 import '../screens/login_screen.dart';
-//screens
-import '../screens/welcome_screen.dart';
 
 class AppDrawer extends StatefulWidget {
   @override
@@ -29,11 +27,14 @@ class _AppDrawerState extends State<AppDrawer> {
                       .loggedInFalse();
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => WelcomeScreen()),
-                    ModalRoute.withName(WelcomeScreen.routeName),
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    ModalRoute.withName(LoginScreen.routeName),
                   );
                 } else {
-                  Navigator.pushNamed(context, LoginScreen.routeName);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      ModalRoute.withName(LoginScreen.routeName));
                 }
               },
               child: ListTile(

@@ -1,4 +1,5 @@
 import 'package:book_bank/screens/home_page.dart';
+import 'package:book_bank/screens/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import '../widgets/rounded_button.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = 'login_screen';
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -21,6 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _auth = FirebaseAuth.instance;
   String email;
   String password;
+
+  bool _isError = false;
+  String _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -82,21 +87,38 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (user != null) {
                       Provider.of<AuthenticationManager>(context, listen: false)
                           .loggedInTrue();
-                      // await Navigator.pushAndRemoveUntil(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => WelcomeScreen()),
-                      //   ModalRoute.withName(WelcomeScreen.routeName),
-                      // );
-                      Navigator.pop(context);
+
+                      Provider.of<AuthenticationManager>(context, listen: false)
+                          .email = email;
                       Navigator.pop(context);
                       Navigator.pushNamed(context, HomePage.routeName);
                     }
                   } catch (e) {
                     print(e);
+                    setState(() {
+                      _isError = true;
+                      _errorMessage = e.toString();
+                    });
                   }
                 },
               ),
+              if (_isError)
+                Text(
+                  // "The email is already registered",
+                  _errorMessage,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red),
+                ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, RegistrationScreen.routeName);
+                },
+                child: Text(
+                  "Not Registered? Sign Up",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.blue),
+                ),
+              )
             ],
           ),
         ),

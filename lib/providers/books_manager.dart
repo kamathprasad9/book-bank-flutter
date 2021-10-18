@@ -1,36 +1,52 @@
+import 'package:book_bank/providers/authentication_manager.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
 //models
 import '../models/book.dart';
+import '../models/owner.dart';
 
 class BooksManager with ChangeNotifier {
   List<Book> _books;
 
+  AuthenticationManager _authenticationManager;
+
+  Owner _owner;
+
   List<Book> get books => _books;
 
   get length => _books.length;
+
+  get owner => _owner;
+
+  set authenticationManager(AuthenticationManager authenticationManager) {
+    _authenticationManager = authenticationManager;
+  }
 
   Future<void> getBooksData() async {
     _books = [];
     try {
       final database = FirebaseDatabase.instance.reference();
       print("fetch data: $database");
-      database.once().then((DataSnapshot snapshot) {
+      await database.once().then((DataSnapshot snapshot) {
         print('Data : ${snapshot.value}');
         if (snapshot.value != null) {
           final extractedData = snapshot.value['booksArray'] as List;
           print("extracted $extractedData");
           if (extractedData != null) {
             print(extractedData);
-            extractedData.forEach((imageData) async {
-              var imagePaths = imageData["image"];
-              String imageURL = await downloadURL(imagePaths);
-              // print(
-              //     "bugDE: ${downloadURLs(imagePaths).then((value) => value)}");
-              _books.add(Book.fromJson(imageData, imageURL));
-            });
+            _books = extractedData
+                .map((imageData) => Book.fromJson(imageData))
+                .toList();
+            // extractedData.forEach((imageData) async {
+            //   print("======$imageData");
+            //   // var imagePaths = imageData["image"];
+            //   // String imageURL = await downloadURL(imagePaths);
+            //   // print(
+            //   //     "bugDE: ${downloadURLs(imagePaths).then((value) => value)}");
+            //   _books.add(Book.fromJson(imageData));
+            // });
           }
         } else {
           _books = null;
@@ -41,6 +57,42 @@ class BooksManager with ChangeNotifier {
     } catch (error) {
       throw "no content";
     }
+  }
+
+  Future<void> getOwnerInfo(String email) async {
+    _owner = null;
+    print("/////");
+    print('getAllUsers $email');
+    String emailReplaced = email.replaceAll("@", "at").replaceAll(".", "dot");
+    print('getAllUsers $email');
+    // try {
+    await FirebaseDatabase.instance
+        .reference()
+        .child('usersArray')
+        .child(emailReplaced)
+        .once()
+        .then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
+        print('usersArray');
+        print(snapshot.value);
+        final extractedData = snapshot.value;
+        // debugPrint("extracted $extractedData");
+        print(extractedData.toString() + "list");
+        if (extractedData != null) {
+          _owner = Owner.fromJson(extractedData);
+
+          ///yaha pe error
+        }
+        print("////${_owner.name}");
+      } else {
+        _owner = null;
+        print("no users found");
+      }
+      notifyListeners();
+    });
+    // } catch (e) {
+    //   throw e;
+    // }
   }
 
   Future<String> downloadURL(String image) async {
