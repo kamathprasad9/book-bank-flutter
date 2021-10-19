@@ -40,15 +40,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                // Flexible(
-                //   child: Hero(
-                //     tag: 'logo',
-                //     child: Container(
-                //       height: 200.0,
-                //       child: Image.asset('images/logo.png'),
-                //     ),
-                //   ),
-                // ),
+                Flexible(
+                  child: Hero(
+                    tag: 'logo',
+                    child: Container(
+                      height: 200.0,
+                      child: Image.asset('assets/icon.png'),
+                    ),
+                  ),
+                ),
                 TextFormField(
                   textAlign: TextAlign.center,
                   onChanged: (value) {

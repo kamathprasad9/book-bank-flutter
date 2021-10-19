@@ -33,10 +33,6 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _widgetOptions = <Widget>[
     BrowseBooks(),
     AddBook(),
-    // Text(
-    //   'Index 2: School',
-    //   // style: optionStyle,
-    // ),
   ];
 
   @override

@@ -131,8 +131,16 @@ class _BrowseBooksState extends State<BrowseBooks> {
                                                         child:
                                                             Icon(Icons.error));
                                                   else
-                                                    return Image.network(
-                                                        snapshot.data);
+                                                    return snapshot.data != null
+                                                        ? Image.network(
+                                                            snapshot.data)
+                                                        : SizedBox(
+                                                            height: 100,
+                                                            width: 78,
+                                                            child: Center(
+                                                                child:
+                                                                    CircularProgressIndicator()),
+                                                          );
                                               }
                                             },
                                           )

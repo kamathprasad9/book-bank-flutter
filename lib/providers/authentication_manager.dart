@@ -22,11 +22,17 @@ class AuthenticationManager with ChangeNotifier {
     print("here +" + _email);
     notifyListeners();
   }
-
-  // Future<String> emailUser() async {
-  //   var preferences = await SharedPreferences.getInstance();
-  //   return _email ?? preferences.getString("email");
+  //
+  // set userName(String userName) {
+  //   _userName = userName;
+  //   print("here +" + _userName);
+  //   notifyListeners();
   // }
+  //
+  // // Future<String> emailUser() async {
+  // //   var preferences = await SharedPreferences.getInstance();
+  // //   return _email ?? preferences.getString("email");
+  // // }
 
   emailSharedPref(String email) async {
     var preference = await SharedPreferences.getInstance();

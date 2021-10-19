@@ -10,6 +10,7 @@ import '../models/owner.dart';
 class BooksManager with ChangeNotifier {
   List<Book> _books;
 
+  // ignore: unused_field
   AuthenticationManager _authenticationManager;
 
   Owner _owner;
@@ -39,14 +40,6 @@ class BooksManager with ChangeNotifier {
             _books = extractedData
                 .map((imageData) => Book.fromJson(imageData))
                 .toList();
-            // extractedData.forEach((imageData) async {
-            //   print("======$imageData");
-            //   // var imagePaths = imageData["image"];
-            //   // String imageURL = await downloadURL(imagePaths);
-            //   // print(
-            //   //     "bugDE: ${downloadURLs(imagePaths).then((value) => value)}");
-            //   _books.add(Book.fromJson(imageData));
-            // });
           }
         } else {
           _books = null;
@@ -65,34 +58,32 @@ class BooksManager with ChangeNotifier {
     print('getAllUsers $email');
     String emailReplaced = email.replaceAll("@", "at").replaceAll(".", "dot");
     print('getAllUsers $email');
-    // try {
-    await FirebaseDatabase.instance
-        .reference()
-        .child('usersArray')
-        .child(emailReplaced)
-        .once()
-        .then((DataSnapshot snapshot) {
-      if (snapshot.value != null) {
-        print('usersArray');
-        print(snapshot.value);
-        final extractedData = snapshot.value;
-        // debugPrint("extracted $extractedData");
-        print(extractedData.toString() + "list");
-        if (extractedData != null) {
-          _owner = Owner.fromJson(extractedData);
-
-          ///yaha pe error
+    try {
+      await FirebaseDatabase.instance
+          .reference()
+          .child('usersArray')
+          .child(emailReplaced)
+          .once()
+          .then((DataSnapshot snapshot) {
+        if (snapshot.value != null) {
+          print('usersArray');
+          print(snapshot.value);
+          final extractedData = snapshot.value;
+          // debugPrint("extracted $extractedData");
+          print(extractedData.toString() + "list");
+          if (extractedData != null) {
+            _owner = Owner.fromJson(extractedData);
+          }
+          print("////${_owner.name}");
+        } else {
+          _owner = null;
+          print("no users found");
         }
-        print("////${_owner.name}");
-      } else {
-        _owner = null;
-        print("no users found");
-      }
-      notifyListeners();
-    });
-    // } catch (e) {
-    //   throw e;
-    // }
+        notifyListeners();
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 
   Future<String> downloadURL(String image) async {

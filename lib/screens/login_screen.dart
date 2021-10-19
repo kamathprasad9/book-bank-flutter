@@ -38,15 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Flexible(
-              //   child: Hero(
-              //     tag: 'logo',
-              //     child: Container(
-              //       height: 200.0,
-              //       child: Image.asset('images/logo.png'),
-              //     ),
-              //   ),
-              // ),
+              Flexible(
+                child: Hero(
+                  tag: 'logo',
+                  child: Container(
+                    height: 200.0,
+                    child: Image.asset('assets/icon.png'),
+                  ),
+                ),
+              ),
               SizedBox(
                 height: 48.0,
               ),
@@ -102,13 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
               ),
-              if (_isError)
-                Text(
-                  // "The email is already registered",
-                  _errorMessage,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.red),
-                ),
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, RegistrationScreen.routeName);
@@ -118,7 +111,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.blue),
                 ),
-              )
+              ),
+              if (_isError)
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    // "The email is already registered",
+                    _errorMessage,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
             ],
           ),
         ),
