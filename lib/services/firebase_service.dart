@@ -47,7 +47,7 @@ class FirebaseService {
           "ownerEmail": jsonData['ownerEmail']
         }).then((value) {
           LocalNotification.showNotification(
-            title: 'Your ad is not live!',
+            title: 'Your ad is live!',
             body:
                 'Your advertisement for the book ${jsonData['bookName']} is posted',
           );
