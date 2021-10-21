@@ -1,3 +1,4 @@
+import 'package:book_bank/providers/authentication_manager.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +7,10 @@ import 'package:provider/provider.dart';
 
 //models
 import '../models/book.dart';
+
 //providers
 import '../providers/books_manager.dart';
+
 //screens
 import '../screens/book_details.dart';
 
@@ -25,9 +28,16 @@ class _BrowseBooksState extends State<BrowseBooks> {
     setState(() {});
   }
 
+  getEmail() async {
+    print(await Provider.of<AuthenticationManager>(context, listen: false)
+            .getEmail() +
+        "getEmail");
+  }
+
   @override
   void initState() {
     super.initState();
+    getEmail();
   }
 
   @override

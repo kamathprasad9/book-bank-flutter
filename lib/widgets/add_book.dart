@@ -7,6 +7,7 @@ import 'package:geocoder/geocoder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import '../constants.dart';
 
 //services
 import '../services/firebase_service.dart';
@@ -56,7 +57,7 @@ class _AddBookState extends State<AddBook> {
     });
     FirebaseService firebaseService = FirebaseService();
 
-    print(Provider.of<AuthenticationManager>(context, listen: false).email +
+    print(await Provider.of<AuthenticationManager>(context, listen: false).getEmail() +
         "email");
 
     await firebaseService.postAdvertisement(<dynamic, dynamic>{
@@ -74,8 +75,8 @@ class _AddBookState extends State<AddBook> {
       "latitude": _currentPosition.latitude.toString(),
       "longitude": _currentPosition.longitude.toString(),
       "ownerEmail":
-          Provider.of<AuthenticationManager>(context, listen: false).email
-    });
+          await Provider.of<AuthenticationManager>(context, listen: false).getEmail()
+    }, context);
 
     // Future.delayed(Duration(seconds: 2));
     setState(() {
@@ -95,12 +96,10 @@ class _AddBookState extends State<AddBook> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
               child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: "Book Name",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: kTextFieldDecoration.copyWith(
+                    labelText: 'Book Name'),
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
@@ -119,10 +118,8 @@ class _AddBookState extends State<AddBook> {
             Container(
               padding: EdgeInsets.all(10),
               child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: "Author Name",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: kTextFieldDecoration.copyWith(
+                    labelText: 'Author Name'),
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
@@ -142,10 +139,8 @@ class _AddBookState extends State<AddBook> {
               padding: EdgeInsets.all(10),
               child: TextFormField(
                 maxLines: 5,
-                decoration: InputDecoration(
-                  labelText: "Description",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: kTextFieldDecoration.copyWith(
+                    labelText: 'Description'),
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
@@ -164,11 +159,8 @@ class _AddBookState extends State<AddBook> {
             Container(
               padding: EdgeInsets.all(10),
               child: TextFormField(
-                decoration: InputDecoration(
-                  hintText: '255',
-                  labelText: "MRP (in Rs)",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: kTextFieldDecoration.copyWith(
+                    hintText: '255', labelText: "MRP (in Rs)",),
                 enableSuggestions: true,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
@@ -261,15 +253,17 @@ class _AddBookState extends State<AddBook> {
             Container(
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border:
-                    Border.all(color: imageExists ? Colors.grey : Colors.red),
+                  border: Border.all(
+                    color:  Colors.blueAccent,
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20))
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     padding: EdgeInsets.all(8),
+
                     child: Row(
                       children: [
                         Text('Upload Photo'),
@@ -339,10 +333,8 @@ class _AddBookState extends State<AddBook> {
               Container(
                 padding: EdgeInsets.all(10),
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Area",
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: kTextFieldDecoration.copyWith(
+                      labelText: 'Area'),
                   enableSuggestions: true,
                   initialValue: _area,
                   textInputAction: TextInputAction.next,
@@ -363,10 +355,8 @@ class _AddBookState extends State<AddBook> {
               Container(
                 padding: EdgeInsets.all(10),
                 child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "City",
-                    border: OutlineInputBorder(),
-                  ),
+                  decoration: kTextFieldDecoration.copyWith(
+                      labelText: 'City'),
                   enableSuggestions: true,
                   initialValue: _city,
                   textInputAction: TextInputAction.next,

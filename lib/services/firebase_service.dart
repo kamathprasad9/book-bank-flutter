@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+
+import '../screens/home_page.dart';
 
 import '../services/local_notification.dart';
 
 class FirebaseService {
-  Future<void> postAdvertisement(Map<dynamic, dynamic> jsonData) async {
+  Future<void> postAdvertisement(Map<dynamic, dynamic> jsonData, BuildContext context) async {
     try {
       final database = FirebaseDatabase.instance.reference();
       print("fetch data: $database");
@@ -51,6 +54,7 @@ class FirebaseService {
             body:
                 'Your advertisement for the book ${jsonData['bookName']} is posted',
           );
+          Navigator.of(context).pushReplacementNamed(HomePage.routeName);
         });
       });
     } catch (error) {

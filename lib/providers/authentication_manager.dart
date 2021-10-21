@@ -12,7 +12,10 @@ class AuthenticationManager with ChangeNotifier {
 
   bool get isLoggedIn => _isLoggedIn;
 
-  String get email => _email;
+  Future<String> getEmail() async {
+    var preference = await SharedPreferences.getInstance();
+    return _email ?? preference.getString('email');
+  }
 
   String get emailReplaced => _emailReplaced;
 
@@ -22,6 +25,7 @@ class AuthenticationManager with ChangeNotifier {
     print("here +" + _email);
     notifyListeners();
   }
+
   //
   // set userName(String userName) {
   //   _userName = userName;
