@@ -11,7 +11,7 @@ import '../providers/books_manager.dart';
 class BookDetails extends StatefulWidget {
   final Book bookDetails;
 
-  BookDetails({@required this.bookDetails});
+  BookDetails({required this.bookDetails});
 
   @override
   _BookDetailsState createState() => _BookDetailsState();
@@ -46,7 +46,8 @@ class _BookDetailsState extends State<BookDetails> {
                     if (snapshot.hasError) {
                       return Center(child: Icon(Icons.error));
                     } else {
-                      return snapshot.data.length > 0
+                      String imageUrl = snapshot.data as String;
+                      return imageUrl.isNotEmpty
                           ? Container(
                               margin: EdgeInsets.only(top: 10),
                               decoration: BoxDecoration(
@@ -54,7 +55,7 @@ class _BookDetailsState extends State<BookDetails> {
                                       Border.all(color: Colors.blue, width: 2)),
                               // height: 500,
                               child:
-                                  Center(child: Image.network(snapshot.data)))
+                                  Center(child: Image.network(imageUrl)))
                           : Center(child: CircularProgressIndicator());
                     }
                 }

@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 
 class Owner {
   String name, contact, email;
 
-  Owner({@required this.email, @required this.contact, @required this.name});
+  Owner({required this.email, required this.contact, required this.name});
 
   factory Owner.fromJson(Map<dynamic, dynamic> jsonData) {
     return Owner(

@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationManager with ChangeNotifier {
-  bool _isLoggedIn;
+  bool _isLoggedIn = false;
 
-  String _email, _emailReplaced;
+  String _email = '', _emailReplaced = '';
 
   AuthenticationManager(bool isLoggedIn) {
     _isLoggedIn = isLoggedIn;
@@ -14,7 +14,9 @@ class AuthenticationManager with ChangeNotifier {
 
   Future<String> getEmail() async {
     var preference = await SharedPreferences.getInstance();
-    return _email ?? preference.getString('email');
+    String storedEmail = preference.getString('email') ?? '';
+
+    return _email != '' ? _email : storedEmail;
   }
 
   String get emailReplaced => _emailReplaced;

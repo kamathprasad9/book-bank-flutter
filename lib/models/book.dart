@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 
 class Book {
   String id,
@@ -16,19 +15,19 @@ class Book {
       ownerEmail;
 
   Book(
-      {@required this.id,
-      @required this.bookName,
-      @required this.authorName,
-      @required this.description,
-      @required this.mrp,
-      @required this.percentOfMRP,
-      @required this.area,
-      @required this.city,
-      @required this.dateOfAdvertisement,
-      @required this.latitude,
-      @required this.longitude,
-      @required this.image,
-      @required this.ownerEmail});
+      {required this.id,
+      required this.bookName,
+      required this.authorName,
+      required this.description,
+      required this.mrp,
+      required this.percentOfMRP,
+      required this.area,
+      required this.city,
+      required this.dateOfAdvertisement,
+      required this.latitude,
+      required this.longitude,
+      required this.image,
+      required this.ownerEmail});
 
   factory Book.fromJson(var jsonData) {
     return Book(

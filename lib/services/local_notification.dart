@@ -22,8 +22,8 @@ class LocalNotification {
 
   static Future showNotification({
     int id = 0,
-    String title,
-    String body,
+    required String title,
+    required String body,
   }) async =>
       _notifications.show(
         id,

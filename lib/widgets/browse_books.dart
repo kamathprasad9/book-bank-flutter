@@ -143,7 +143,7 @@ class _BrowseBooksState extends State<BrowseBooks> {
                                                   else
                                                     return snapshot.data != null
                                                         ? Image.network(
-                                                            snapshot.data)
+                                                            snapshot.data.toString())
                                                         : SizedBox(
                                                             height: 100,
                                                             width: 78,

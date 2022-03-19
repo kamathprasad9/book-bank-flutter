@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var _currentIndex = 0;
-  PageController _pageController;
+  late PageController _pageController;
 
   @override
   void initState() {

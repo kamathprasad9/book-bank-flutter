@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 //providers
 import './providers/authentication_manager.dart';
 import './providers/books_manager.dart';
+
 //screens
 import './screens/home_page.dart';
 import './screens/login_screen.dart';
@@ -27,7 +28,7 @@ void main() async {
   );
 
   await _localNotifications.initialize(initSettings,
-      onSelectNotification: (String payload) async {
+      onSelectNotification: (String? payload) async {
     if (payload != null) {
       debugPrint('notification payload: ' + payload);
     }
@@ -45,11 +46,9 @@ void main() async {
         ),
         ChangeNotifierProxyProvider<AuthenticationManager, BooksManager>(
           create: (_) => BooksManager(),
-          update: (_,
-                  // AuthManager authManager,
-                  AuthenticationManager authenticationManager,
-                  BooksManager booksManager) =>
-              booksManager..authenticationManager = authenticationManager,
+          update: (_, AuthenticationManager? authenticationManager,
+                  BooksManager? booksManager) =>
+              booksManager!..authenticationManager = authenticationManager!,
         ),
       ],
       child: BookBank(
@@ -60,7 +59,7 @@ void main() async {
 class BookBank extends StatelessWidget {
   final bool isLoggedIn;
 
-  BookBank({this.isLoggedIn});
+  BookBank({required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {

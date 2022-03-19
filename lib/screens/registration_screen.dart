@@ -18,12 +18,11 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen> {
   final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
-  String email;
-  String password;
+  late String email, password;
 
-  String name, contact;
+  late String name, contact;
   bool _isError = false;
-  String _errorMessage;
+  late String _errorMessage;
 
   final GlobalKey<FormState> _formKey = GlobalKey();
 
@@ -55,7 +54,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     name = value;
                   },
                   validator: (value) {
-                    if (value.isEmpty) {
+                    if (value!.isEmpty) {
                       return "Required";
                     }
                     return null;
@@ -73,7 +72,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     contact = value;
                   },
                   validator: (value) {
-                    if (value.isEmpty) {
+                    if (value!.isEmpty) {
                       return "Required";
                     } else if (value.length != 10) {
                       return "Should be 10 digit long";
@@ -95,10 +94,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   decoration: kTextFieldDecoration.copyWith(
                       hintText: 'Enter your email'),
                   validator: (value) {
-                    Pattern pattern =
-                        r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
-                    RegExp regex = RegExp(pattern);
-                    if (value.isEmpty) {
+                    // Pattern pattern =
+                    //     r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
+                    RegExp regex = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
+                    if (value!.isEmpty) {
                       return "Required";
                     } else if (!regex.hasMatch(value)) {
                       return "Enter valid Email";
@@ -116,7 +115,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     password = value;
                   },
                   validator: (value) {
-                    if (value.isEmpty) {
+                    if (value!.isEmpty) {
                       return "Required";
                     } else if (value.length < 6) {
                       return "Password should be at least 6 characters long";
@@ -195,12 +194,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _submit() {
     // getLoc();
     print("$name+$contact+$email+$contact");
-    final isValid = _formKey.currentState.validate();
+    final isValid = _formKey.currentState!.validate();
 
     if (!isValid) {
       return false;
     }
-    _formKey.currentState.save();
+    _formKey.currentState!.save();
     return true;
   }
 }

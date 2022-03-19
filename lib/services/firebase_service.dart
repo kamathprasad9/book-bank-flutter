@@ -67,7 +67,7 @@ class FirebaseService {
         FirebaseStorage.instance.ref().child('books/$id');
     await storageReference.putFile(image).then((p0) => print("File Uploaded"));
 
-    String returnURL;
+    late String returnURL;
 
     await storageReference.getDownloadURL().then((value) => returnURL = value);
     // print("returnURL $returnURL");

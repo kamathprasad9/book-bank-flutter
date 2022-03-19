@@ -8,12 +8,12 @@ import '../models/book.dart';
 import '../models/owner.dart';
 
 class BooksManager with ChangeNotifier {
-  List<Book> _books;
+  late List<Book> _books;
 
   // ignore: unused_field
-  AuthenticationManager _authenticationManager;
+  late AuthenticationManager _authenticationManager;
 
-  Owner _owner;
+  late Owner? _owner;
 
   List<Book> get books => _books;
 
@@ -35,14 +35,14 @@ class BooksManager with ChangeNotifier {
         if (snapshot.value != null) {
           final extractedData = snapshot.value['booksArray'] as List;
           print("extracted $extractedData");
-          if (extractedData != null) {
+          if (extractedData.isNotEmpty) {
             print(extractedData);
             _books = extractedData
                 .map((imageData) => Book.fromJson(imageData))
                 .toList();
           }
         } else {
-          _books = null;
+          _books = [];
         }
         notifyListeners();
         return _books;
@@ -74,7 +74,7 @@ class BooksManager with ChangeNotifier {
           if (extractedData != null) {
             _owner = Owner.fromJson(extractedData);
           }
-          print("////${_owner.name}");
+          print("////${_owner!.name}");
         } else {
           _owner = null;
           print("no users found");

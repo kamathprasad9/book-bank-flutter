@@ -25,10 +25,12 @@ class _AddBookState extends State<AddBook> {
   bool isLoading = false;
 
   RadioButtonType _radioButtonType = RadioButtonType.donate;
-  LocationData _currentPosition;
-  String _bookName, _authorName, _description, _area, _city, _mrp;
+  late LocationData _currentPosition;
+  late String _bookName, _authorName, _description;
+  String? _area, _city;
+  String? _mrp;
   double _percent = 4.0 / 100;
-  DateTime _dateTime;
+  late DateTime _dateTime;
   Location location = Location();
 
   @override
@@ -40,7 +42,7 @@ class _AddBookState extends State<AddBook> {
   void _submit() async {
     // getLoc();
     print("$_bookName+$_authorName+$_description+$_area+$_city+$_mrp");
-    final isValid = _formKey.currentState.validate();
+    final isValid = _formKey.currentState!.validate();
     setState(() {
       if (_image != null)
         imageExists = true;
@@ -50,7 +52,7 @@ class _AddBookState extends State<AddBook> {
     if (!isValid || !imageExists) {
       return;
     }
-    _formKey.currentState.save();
+    _formKey.currentState!.save();
     setState(() {
       isLoading = true;
       print("$isLoading isLoading");
@@ -103,7 +105,7 @@ class _AddBookState extends State<AddBook> {
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
-                  if (value.isEmpty) {
+                  if (value!.isEmpty) {
                     return "Required";
                   }
                   return null;
@@ -123,7 +125,7 @@ class _AddBookState extends State<AddBook> {
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
-                  if (value.isEmpty) {
+                  if (value!.isEmpty) {
                     return "Required";
                   }
                   return null;
@@ -144,7 +146,7 @@ class _AddBookState extends State<AddBook> {
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
-                  if (value.isEmpty) {
+                  if (value!.isEmpty) {
                     return "Required";
                   }
                   return null;
@@ -165,7 +167,7 @@ class _AddBookState extends State<AddBook> {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
-                  if (value.isEmpty) {
+                  if (value!.isEmpty) {
                     return "Required";
                   }
                   return null;
@@ -194,9 +196,9 @@ class _AddBookState extends State<AddBook> {
                             leading: Radio<RadioButtonType>(
                               value: RadioButtonType.donate,
                               groupValue: _radioButtonType,
-                              onChanged: (RadioButtonType value) {
+                              onChanged: (RadioButtonType? value) {
                                 setState(() {
-                                  _radioButtonType = value;
+                                  _radioButtonType = value!;
                                   print(_radioButtonType);
                                   _percent = 0;
                                 });
@@ -228,9 +230,9 @@ class _AddBookState extends State<AddBook> {
                                 leading: Radio<RadioButtonType>(
                                   value: RadioButtonType.slider,
                                   groupValue: _radioButtonType,
-                                  onChanged: (RadioButtonType value) {
+                                  onChanged: (RadioButtonType? value) {
                                     setState(() {
-                                      _radioButtonType = value;
+                                      _radioButtonType = value!;
                                       print(_radioButtonType);
                                     });
                                   },
@@ -240,7 +242,7 @@ class _AddBookState extends State<AddBook> {
                                 Container(
                                   padding: EdgeInsets.only(left: 70),
                                   child: Text(
-                                      '${_percent.round()}% of Rs. $_mrp = Rs. ${(double.parse(_mrp) * _percent / 100).round()}'),
+                                      '${_percent.round()}% of Rs. ${_mrp!} = Rs. ${(double.parse(_mrp!) * _percent / 100).round()}'),
                                 ),
                             ],
                           ),
@@ -315,7 +317,7 @@ class _AddBookState extends State<AddBook> {
                         ),
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: FileImage(_image),
+                            image: FileImage(_image!),
                           ),
                         ),
                       ),
@@ -339,7 +341,7 @@ class _AddBookState extends State<AddBook> {
                   initialValue: _area,
                   textInputAction: TextInputAction.next,
                   validator: (value) {
-                    if (value.isEmpty) {
+                    if (value!.isEmpty) {
                       return "Required";
                     }
                     return null;
@@ -361,7 +363,7 @@ class _AddBookState extends State<AddBook> {
                   initialValue: _city,
                   textInputAction: TextInputAction.next,
                   validator: (value) {
-                    if (value.isEmpty) {
+                    if (value!.isEmpty) {
                       return "Required";
                     }
                     return null;
@@ -437,7 +439,7 @@ class _AddBookState extends State<AddBook> {
           _dateTime = DateTime.now();
           // _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
           _currentPosition = currentLocation;
-          _getAddress(_currentPosition.latitude, _currentPosition.longitude)
+          _getAddress(_currentPosition.latitude!, _currentPosition.longitude!)
               .then((value) {
             setState(() {
               print(value.first.locality); //city
@@ -459,7 +461,7 @@ class _AddBookState extends State<AddBook> {
   }
 
   // Image Picker
-  File _image;
+  File? _image;
 
   Future getImage(bool gallery) async {
     ImagePicker picker = ImagePicker();
@@ -467,16 +469,16 @@ class _AddBookState extends State<AddBook> {
     // Let user select photo from gallery
     if (gallery) {
       // ignore: deprecated_member_use
-      pickedFile = await picker.getImage(
+      pickedFile = (await picker.getImage(
         source: ImageSource.gallery,
-      );
+      ))!;
     }
     // Otherwise open camera to get new photo
     else {
       // ignore: deprecated_member_use
-      pickedFile = await picker.getImage(
+      pickedFile = (await picker.getImage(
         source: ImageSource.camera,
-      );
+      ))!;
     }
 
     setState(() {
