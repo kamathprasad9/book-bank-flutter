@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -28,7 +29,7 @@ void main() async {
   );
 
   await _localNotifications.initialize(initSettings,
-      onSelectNotification: (String? payload) async {
+      onSelectNotification: (String payload) async {
     if (payload != null) {
       debugPrint('notification payload: ' + payload);
     }
@@ -46,9 +47,9 @@ void main() async {
         ),
         ChangeNotifierProxyProvider<AuthenticationManager, BooksManager>(
           create: (_) => BooksManager(),
-          update: (_, AuthenticationManager? authenticationManager,
-                  BooksManager? booksManager) =>
-              booksManager!..authenticationManager = authenticationManager!,
+          update: (_, AuthenticationManager authenticationManager,
+                  BooksManager booksManager) =>
+              booksManager..authenticationManager = authenticationManager,
         ),
       ],
       child: BookBank(
@@ -59,7 +60,7 @@ void main() async {
 class BookBank extends StatelessWidget {
   final bool isLoggedIn;
 
-  BookBank({required this.isLoggedIn});
+  BookBank({@required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
