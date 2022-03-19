@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:book_bank/providers/authentication_manager.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:image_picker/image_picker.dart';
@@ -36,12 +37,15 @@ class _AddBookState extends State<AddBook> {
   @override
   void initState() {
     super.initState();
-    getLoc();
+    setState(() {
+      _dateTime = DateTime.now();
+    });
+    if (!kIsWeb) getLoc();
   }
 
   void _submit() async {
     // getLoc();
-    print("$_bookName+$_authorName+$_description+$_area+$_city+$_mrp");
+    // print("$_bookName+$_authorName+$_description+$_area+$_city+$_mrp");
     final isValid = _formKey.currentState!.validate();
     setState(() {
       if (_image != null)
@@ -59,7 +63,8 @@ class _AddBookState extends State<AddBook> {
     });
     FirebaseService firebaseService = FirebaseService();
 
-    print(await Provider.of<AuthenticationManager>(context, listen: false).getEmail() +
+    print(await Provider.of<AuthenticationManager>(context, listen: false)
+            .getEmail() +
         "email");
 
     await firebaseService.postAdvertisement(<dynamic, dynamic>{
@@ -74,10 +79,11 @@ class _AddBookState extends State<AddBook> {
       "city": _city,
       "dateOfAdvertisement": _dateTime,
       "image": _image,
-      "latitude": _currentPosition.latitude.toString(),
-      "longitude": _currentPosition.longitude.toString(),
+      "latitude": !kIsWeb ? _currentPosition.latitude.toString() : '',
+      "longitude": !kIsWeb ? _currentPosition.longitude.toString() : '',
       "ownerEmail":
-          await Provider.of<AuthenticationManager>(context, listen: false).getEmail()
+          await Provider.of<AuthenticationManager>(context, listen: false)
+              .getEmail()
     }, context);
 
     // Future.delayed(Duration(seconds: 2));
@@ -100,8 +106,8 @@ class _AddBookState extends State<AddBook> {
             Container(
               padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
               child: TextFormField(
-                decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Book Name'),
+                decoration:
+                    kTextFieldDecoration.copyWith(labelText: 'Book Name'),
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
@@ -120,8 +126,8 @@ class _AddBookState extends State<AddBook> {
             Container(
               padding: EdgeInsets.all(10),
               child: TextFormField(
-                decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Author Name'),
+                decoration:
+                    kTextFieldDecoration.copyWith(labelText: 'Author Name'),
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
@@ -141,8 +147,8 @@ class _AddBookState extends State<AddBook> {
               padding: EdgeInsets.all(10),
               child: TextFormField(
                 maxLines: 5,
-                decoration: kTextFieldDecoration.copyWith(
-                    labelText: 'Description'),
+                decoration:
+                    kTextFieldDecoration.copyWith(labelText: 'Description'),
                 enableSuggestions: true,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
@@ -162,13 +168,17 @@ class _AddBookState extends State<AddBook> {
               padding: EdgeInsets.all(10),
               child: TextFormField(
                 decoration: kTextFieldDecoration.copyWith(
-                    hintText: '255', labelText: "MRP (in Rs)",),
+                  hintText: '255',
+                  labelText: "MRP (in Rs)",
+                ),
                 enableSuggestions: true,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return "Required";
+                  } else if (double.tryParse(value) == null) {
+                    return "Should only contain numbers";
                   }
                   return null;
                 },
@@ -256,16 +266,14 @@ class _AddBookState extends State<AddBook> {
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                   border: Border.all(
-                    color:  Colors.blueAccent,
+                    color: Colors.blueAccent,
                   ),
-                  borderRadius: BorderRadius.all(Radius.circular(20))
-              ),
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     padding: EdgeInsets.all(8),
-
                     child: Row(
                       children: [
                         Text('Upload Photo'),
@@ -287,41 +295,73 @@ class _AddBookState extends State<AddBook> {
                     ),
                   ),
                   if (_image != null)
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      width: MediaQuery.of(context).size.width,
-                      child: Container(
-                        margin: EdgeInsets.all(8),
-                        height: MediaQuery.of(context).size.height * 0.25,
-                        width: MediaQuery.of(context).size.width * 0.33,
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _image = null;
-                                });
-                              },
-                              child: Icon(
-                                Icons.cancel,
-                                color: Colors.white,
+                    !kIsWeb
+                        ? SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            width: MediaQuery.of(context).size.width,
+                            child: Container(
+                              margin: EdgeInsets.all(8),
+                              height: MediaQuery.of(context).size.height * 0.25,
+                              width: MediaQuery.of(context).size.width * 0.33,
+                              child: Align(
+                                alignment: Alignment.topRight,
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _image = null;
+                                      });
+                                    },
+                                    child: Icon(
+                                      Icons.cancel,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: FileImage(_image!.absolute),
+                                ),
+                              ),
+                            ))
+                        : Container(
+                            margin: EdgeInsets.all(8),
+                            // height: MediaQuery.of(context).size.height * 0.25,
+                            // width: MediaQuery.of(context).size.width * 0.33,
+                            child: Row(
+                              children: [
+                                Text(_image!.path),
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _image = null;
+                                        });
+                                      },
+                                      child: Icon(
+                                        Icons.cancel,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
+                            decoration: BoxDecoration(),
                           ),
-                        ),
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: FileImage(_image!),
-                          ),
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
@@ -331,14 +371,13 @@ class _AddBookState extends State<AddBook> {
                 textAlign: TextAlign.left,
                 style: TextStyle(color: Colors.red),
               ),
-            if (_area != null)
+            if (_area != null || kIsWeb)
               Container(
                 padding: EdgeInsets.all(10),
                 child: TextFormField(
-                  decoration: kTextFieldDecoration.copyWith(
-                      labelText: 'Area'),
+                  decoration: kTextFieldDecoration.copyWith(labelText: 'Area'),
                   enableSuggestions: true,
-                  initialValue: _area,
+                  initialValue: kIsWeb ? _area : '',
                   textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -353,14 +392,13 @@ class _AddBookState extends State<AddBook> {
                   },
                 ),
               ),
-            if (_city != null)
+            if (_city != null || kIsWeb)
               Container(
                 padding: EdgeInsets.all(10),
                 child: TextFormField(
-                  decoration: kTextFieldDecoration.copyWith(
-                      labelText: 'City'),
+                  decoration: kTextFieldDecoration.copyWith(labelText: 'City'),
                   enableSuggestions: true,
-                  initialValue: _city,
+                  initialValue: kIsWeb ? _city : '',
                   textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -436,7 +474,6 @@ class _AddBookState extends State<AddBook> {
 
       if (mounted) {
         setState(() {
-          _dateTime = DateTime.now();
           // _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
           _currentPosition = currentLocation;
           _getAddress(_currentPosition.latitude!, _currentPosition.longitude!)
@@ -484,6 +521,11 @@ class _AddBookState extends State<AddBook> {
     setState(() {
       if (pickedFile != null) {
         // _images.add(File(pickedFile.path));
+        if (kIsWeb) {
+          _image = File(pickedFile.path);
+        } else {
+          _image = File(pickedFile.path);
+        }
         _image = File(pickedFile.path); // Use if you only need a single picture
       } else {
         print('No image selected.');
