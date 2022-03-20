@@ -4,7 +4,9 @@ import 'package:book_bank/providers/authentication_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:latlng/latlng.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
@@ -26,13 +28,14 @@ class _AddBookState extends State<AddBook> {
   bool isLoading = false;
 
   RadioButtonType _radioButtonType = RadioButtonType.donate;
-  late LocationData _currentPosition;
+  late LatLng _currentPosition;
   late String _bookName, _authorName, _description;
   String? _area, _city;
   String? _mrp;
   double _percent = 4.0 / 100;
   late DateTime _dateTime;
-  Location location = Location();
+
+  // Location location = Location();
 
   @override
   void initState() {
@@ -40,7 +43,8 @@ class _AddBookState extends State<AddBook> {
     setState(() {
       _dateTime = DateTime.now();
     });
-    if (!kIsWeb) getLoc();
+    // if (!kIsWeb)
+    getLoc();
   }
 
   void _submit() async {
@@ -377,7 +381,7 @@ class _AddBookState extends State<AddBook> {
                 child: TextFormField(
                   decoration: kTextFieldDecoration.copyWith(labelText: 'Area'),
                   enableSuggestions: true,
-                  initialValue: kIsWeb ? _area : '',
+                  initialValue: !kIsWeb ? _area : '',
                   textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -398,7 +402,7 @@ class _AddBookState extends State<AddBook> {
                 child: TextFormField(
                   decoration: kTextFieldDecoration.copyWith(labelText: 'City'),
                   enableSuggestions: true,
-                  initialValue: kIsWeb ? _city : '',
+                  initialValue: !kIsWeb ? _city : '',
                   textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -449,52 +453,24 @@ class _AddBookState extends State<AddBook> {
   }
 
   getLoc() async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _currentPosition = await location.getLocation();
-    location.onLocationChanged.listen((LocationData currentLocation) {
-      // print("${currentLocation.longitude} : ${currentLocation.longitude}");
-
+    try {
+      var position = await GeolocatorPlatform.instance.getCurrentPosition();
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
       if (mounted) {
         setState(() {
-          // _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
-          _currentPosition = currentLocation;
-          _getAddress(_currentPosition.latitude!, _currentPosition.longitude!)
-              .then((value) {
-            setState(() {
-              print(value.first.locality); //city
-              print(value.first.subLocality); //area
-              _area = _area ?? "${value.first.subLocality}";
-              _city = _city ?? '${value.first.locality}';
-            });
-          });
+          _currentPosition = LatLng(position.latitude, position.longitude);
+
+          print("Prasad" + placemarks[0].toString());
+          _area = "${placemarks[0].subLocality}";
+          _city = _city ?? '${placemarks[0].locality}';
+          print(_area);
+          print(_area != null || kIsWeb);
         });
       }
-    });
-  }
-
-  Future<List<Address>> _getAddress(double lat, double lang) async {
-    final coordinates = new Coordinates(lat, lang);
-    List<Address> add =
-        await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    return add;
+    } catch (err) {}
   }
 
   // Image Picker

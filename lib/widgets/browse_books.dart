@@ -249,7 +249,7 @@ class _BrowseBooksState extends State<BrowseBooks> {
   }
 
   Future<String> getUrl(String image) async {
-    print("posi: $image");
+    // print("posi: $image");
     final String downloadURL =
         await FirebaseStorage.instance.ref("books/$image").getDownloadURL();
     // print(downloadURL);
