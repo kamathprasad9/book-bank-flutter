@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:book_bank/providers/authentication_manager.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:html' as html;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:latlng/latlng.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import '../constants.dart';
 
@@ -48,11 +49,13 @@ class _AddBookState extends State<AddBook> {
   }
 
   void _submit() async {
+
+    print('reus ' + _imageWeb!.value.toString());
     // getLoc();
     // print("$_bookName+$_authorName+$_description+$_area+$_city+$_mrp");
     final isValid = _formKey.currentState!.validate();
     setState(() {
-      if (_image != null)
+      if (_image != null || _imageWeb!.value!.length != 0)
         imageExists = true;
       else
         imageExists = false;
@@ -70,7 +73,6 @@ class _AddBookState extends State<AddBook> {
     print(await Provider.of<AuthenticationManager>(context, listen: false)
             .getEmail() +
         "email");
-
     await firebaseService.postAdvertisement(<dynamic, dynamic>{
       "bookName": _bookName,
       "authorName": _authorName,
@@ -82,13 +84,13 @@ class _AddBookState extends State<AddBook> {
       "area": _area,
       "city": _city,
       "dateOfAdvertisement": _dateTime,
-      "image": _image,
+      "image": !kIsWeb ? _image : _imageWeb,
       "latitude": !kIsWeb ? _currentPosition.latitude.toString() : '',
       "longitude": !kIsWeb ? _currentPosition.longitude.toString() : '',
       "ownerEmail":
           await Provider.of<AuthenticationManager>(context, listen: false)
               .getEmail()
-    }, context);
+    }, _imageWeb!, context);
 
     // Future.delayed(Duration(seconds: 2));
     setState(() {
@@ -270,7 +272,7 @@ class _AddBookState extends State<AddBook> {
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.blueAccent,
+                    color: imageExists ? Colors.blueAccent : Colors.red,
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(20))),
               child: Column(
@@ -289,59 +291,41 @@ class _AddBookState extends State<AddBook> {
                               color: Colors.white,
                             ),
                             elevation: 8,
-                            onPressed: () {
-                              getImage(true);
-                            },
+                            onPressed: !kIsWeb
+                                ? () {
+                                    getImage(true);
+                                  }
+                                : () async {
+                                    // _pickImage();
+                                    _imageWeb!.click();
+                                    await FirebaseService()
+                                        .uploadToStorage(_imageWeb!);
+                                    await Future.delayed(Duration(seconds: 3));
+                                    // _imageWeb!.();
+                                    setState(() {
+                                      _imageWebText = _imageWeb?.value;
+                                      print('inside setstate $_imageWebText');
+                                    });
+
+                                    print("${_imageWeb?.value} value");
+                                  },
                             padding: EdgeInsets.all(15),
                             shape: CircleBorder(),
                           ),
                       ],
                     ),
                   ),
-                  if (_image != null)
-                    !kIsWeb
-                        ? SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.3,
-                            width: MediaQuery.of(context).size.width,
-                            child: Container(
-                              margin: EdgeInsets.all(8),
-                              height: MediaQuery.of(context).size.height * 0.25,
-                              width: MediaQuery.of(context).size.width * 0.33,
-                              child: Align(
-                                alignment: Alignment.topRight,
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _image = null;
-                                      });
-                                    },
-                                    child: Icon(
-                                      Icons.cancel,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: FileImage(_image!.absolute),
-                                ),
-                              ),
-                            ))
-                        : Container(
-                            margin: EdgeInsets.all(8),
-                            // height: MediaQuery.of(context).size.height * 0.25,
-                            // width: MediaQuery.of(context).size.width * 0.33,
-                            child: Row(
-                              children: [
-                                Text(_image!.path),
-                                Align(
+                  !kIsWeb
+                      ? _image != null
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.3,
+                              width: MediaQuery.of(context).size.width,
+                              child: Container(
+                                margin: EdgeInsets.all(8),
+                                height:
+                                    MediaQuery.of(context).size.height * 0.25,
+                                width: MediaQuery.of(context).size.width * 0.33,
+                                child: Align(
                                   alignment: Alignment.topRight,
                                   child: Container(
                                     padding: EdgeInsets.all(10),
@@ -362,10 +346,64 @@ class _AddBookState extends State<AddBook> {
                                     ),
                                   ),
                                 ),
-                              ],
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: FileImage(_image!.absolute),
+                                  ),
+                                ),
+                              ))
+                          : Container(
+                              child: Text("Uded"),
+                            )
+                      // : _imageWeb!.value!.length != 0
+                      : _imageWeb!.value!.length != 0
+                          ? Container(
+                              margin: EdgeInsets.all(8),
+                              // height: MediaQuery.of(context).size.height * 0.25,
+                              // width: MediaQuery.of(context).size.width * 0.33,
+                              child: Row(
+                                children: [
+                                  Column(
+                                    children: [
+                                      // _mediaInfo != null
+                                      //     ? SizedBox(
+                                      //         height: 200,
+                                      //         width: 400,
+                                      //         child: _mediaInfo)
+                                      //     : Container(),
+                                      Text(_imageWeb!.value!.split('\\').last),
+                                    ],
+                                  ),
+                                  // Text("Uded"),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                      ),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _image = null;
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.cancel,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              decoration: BoxDecoration(),
+                            )
+                          : Container(
+                              child: Text('setstate'),
                             ),
-                            decoration: BoxDecoration(),
-                          ),
                 ],
               ),
             ),
@@ -463,11 +501,11 @@ class _AddBookState extends State<AddBook> {
         setState(() {
           _currentPosition = LatLng(position.latitude, position.longitude);
 
-          print("Prasad" + placemarks[0].toString());
+          // print("Prasad" + placemarks[0].toString());
           _area = "${placemarks[0].subLocality}";
           _city = _city ?? '${placemarks[0].locality}';
           print(_area);
-          print(_area != null || kIsWeb);
+          // print(_area != null || kIsWeb);
         });
       }
     } catch (err) {}
@@ -475,6 +513,35 @@ class _AddBookState extends State<AddBook> {
 
   // Image Picker
   File? _image;
+  html.InputElement? _imageWeb =
+      html.FileUploadInputElement() as html.InputElement..accept = 'image/*';
+
+  // String? _imageWeb?
+  String? _imageWebText;
+
+  // Image? _pickedImage;
+  // MediaInfo? _mediaInfo;
+
+  // Future<void> _pickImage() async {
+  //   // final fromPicker = await ImagePickerWeb.getImageAsWidget();
+  //   // print(_pickedImage == null);
+  //   // if (fromPicker != null) {
+  //   //   setState(() {
+  //   //     _pickedImage = fromPicker;
+  //   //   });
+  //   // }
+  //   // print(_pickedImage?.semanticLabel);
+  //   // print("-");
+  //   // final imagePicker = await ImagePickerWeb.getImageAsFile();
+  //   // print(imagePicker?.name);
+  //   //
+  //   print("-");
+  //   _mediaInfo = await ImagePickerWeb.getImageInfo;
+  //   print(_mediaInfo?.fileName);
+  //   // print(_pickedImage?.image);
+  //   setState(() {});
+  //   // print(_pickedImages);
+  // }
 
   Future getImage(bool gallery) async {
     ImagePicker picker = ImagePicker();
@@ -495,6 +562,7 @@ class _AddBookState extends State<AddBook> {
     }
 
     setState(() {
+      // ignore: unnecessary_null_comparison
       if (pickedFile != null) {
         // _images.add(File(pickedFile.path));
         if (kIsWeb) {
@@ -502,10 +570,26 @@ class _AddBookState extends State<AddBook> {
         } else {
           _image = File(pickedFile.path);
         }
-        _image = File(pickedFile.path); // Use if you only need a single picture
+        // _image = File(pickedFile.path); // Use if you only need a single picture
       } else {
         print('No image selected.');
       }
+    });
+  }
+
+  uploadToStorage() {
+    print(" uploadtostorage");
+
+    _imageWeb!.onChange.listen((event) {
+      final file = _imageWeb!.files?.first;
+      final reader = html.FileReader();
+      reader.readAsDataUrl(file!);
+      reader.onLoadEnd.listen((event) async {
+        var snapshot =
+            await FirebaseStorage.instance.ref().child('newfile').putBlob(file);
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+        print(downloadUrl + " uploadtostorage");
+      });
     });
   }
 }

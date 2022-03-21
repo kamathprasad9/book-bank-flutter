@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:book_bank/screens/home_page.dart';
 import 'package:book_bank/screens/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';

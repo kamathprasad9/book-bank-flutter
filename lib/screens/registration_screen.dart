@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 //constants
 import '../constants.dart';
@@ -140,6 +139,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         final newUser =
                             await _auth.createUserWithEmailAndPassword(
                                 email: email, password: password);
+                        // ignore: unnecessary_null_comparison
                         if (newUser != null) {
                           await FirebaseDatabase.instance
                               .reference()

@@ -29,14 +29,14 @@ class BooksManager with ChangeNotifier {
     _books = [];
     try {
       final database = FirebaseDatabase.instance.reference();
-      print("fetch data: $database");
+      // print("fetch data: $database");
       await database.once().then((DataSnapshot snapshot) {
-        print('Data : ${snapshot.value}');
+        // print('Data : ${snapshot.value}');
         if (snapshot.value != null) {
           final extractedData = snapshot.value['booksArray'] as List;
-          print("extracted $extractedData");
+          // print("extracted $extractedData");
           if (extractedData.isNotEmpty) {
-            print(extractedData);
+            // print(extractedData);
             _books = extractedData
                 .map((imageData) => Book.fromJson(imageData))
                 .toList();
@@ -55,9 +55,9 @@ class BooksManager with ChangeNotifier {
   Future<void> getOwnerInfo(String email) async {
     _owner = null;
     print("/////");
-    print('getAllUsers $email');
+    // print('getAllUsers $email');
     String emailReplaced = email.replaceAll("@", "at").replaceAll(".", "dot");
-    print('getAllUsers $email');
+    // print('getAllUsers $email');
     try {
       await FirebaseDatabase.instance
           .reference()

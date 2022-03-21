@@ -1,6 +1,7 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:book_bank/providers/authentication_manager.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -103,9 +104,9 @@ class _BrowseBooksState extends State<BrowseBooks> {
                               : 0,
                           itemBuilder: (context, index) {
                             Book book = books[index];
-                            print(book.image);
+                            // print(book.image);
                             Future<String> imageUrl = getUrl(book.image);
-                            print("toast $imageUrl");
+                            // print("toast $imageUrl");
                             return GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -120,6 +121,7 @@ class _BrowseBooksState extends State<BrowseBooks> {
                                   Container(
                                     margin: EdgeInsets.all(10),
                                     height: 100,
+                                    // ignore: unnecessary_null_comparison
                                     child: imageUrl != null
                                         ? FutureBuilder(
                                             future: getUrl(book.image),
