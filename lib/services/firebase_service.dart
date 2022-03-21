@@ -14,8 +14,8 @@ import '../screens/home_page.dart';
 import '../services/local_notification.dart';
 
 class FirebaseService {
-  Future<void> postAdvertisement(Map<dynamic, dynamic> jsonData,
-      html.InputElement imageWeb, BuildContext context) async {
+  Future<void> postAdvertisement(
+      Map<dynamic, dynamic> jsonData, BuildContext context) async {
     try {
       final database = FirebaseDatabase.instance.reference();
       // print("fetch data: $database");
@@ -36,10 +36,8 @@ class FirebaseService {
           // _books = null;
         }
         if (!kIsWeb) {
-          uploadFile(jsonData['image'], id);
+          uploadFromPhone(jsonData['image'], id);
         } else {
-          // uploadWeb(jsonData['image'], id);
-
           // uploading logic done as soon as image is selected
           // uploadToStorage(imageWeb);
         }
@@ -78,24 +76,14 @@ class FirebaseService {
     }
   }
 
-  Future<String> uploadFile(File image, String id) async {
+  Future<String> uploadFromPhone(File image, String id) async {
     print("uploadFile");
     Reference storageReference =
         FirebaseStorage.instance.ref().child('books/$id');
-    // if (!kIsWeb) {
+
     await storageReference
         .putFile(image)
         .then((value) => print("File Uploaded"));
-    // } else {
-    //   print(image.path + " image path");
-    //   final metadata = SettableMetadata(
-    //       contentType: 'image/jpeg',
-    //       customMetadata: {'picked-file-path': image.path});
-    //   await storageReference
-    //       .putData(await image.readAsBytes(), metadata)
-    //       .then((value) => print("File Uploaded"));
-    // }
-
     late String returnURL;
 
     await storageReference.getDownloadURL().then((value) => returnURL = value);
@@ -103,39 +91,7 @@ class FirebaseService {
     return returnURL;
   }
 
-  uploadWeb(MediaInfo mediaInfo, String fileName) async {
-    try {
-      String? mimeType = mime(path.basename(mediaInfo.fileName ?? ''));
-
-      // html.File mediaFile =
-      //     new html.File(mediaInfo.data, mediaInfo.fileName, {'type': mimeType});
-      final String? extension = extensionFromMime(mimeType!);
-
-      var metadata = SettableMetadata(
-        contentType: mimeType,
-      );
-
-      // Reference storageReference =
-      //     fb.storage().ref(ref).child(fileName + ".$extension");
-      print("cupertino  " +
-          metadata.contentType.toString() +
-          ' ' +
-          mediaInfo.fileName.toString());
-      await FirebaseStorage.instance
-          .ref()
-          .child('books/$fileName')
-          .putBlob(mediaInfo.data, metadata);
-
-      // Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
-      // print("download url $imageUri");
-      // return imageUri;
-    } catch (e) {
-      // print("File Upload Error $e");
-      // return null;
-    }
-  }
-
-  uploadToStorage(html.InputElement imageWeb) {
+  uploadFromWeb(html.InputElement imageWeb) {
     final database = FirebaseDatabase.instance.reference();
     // print("fetch data: $database");
     database.once().then((DataSnapshot snapshot) async {
@@ -167,20 +123,51 @@ class FirebaseService {
         });
       });
     });
-    // }
   }
 
-  static Future<String> uploadImageToFirebaseAndShareDownloadUrl(
-      MediaInfo info, String attribute1, File image) async {
-    String? mimeType = mime(path.basename(info.fileName ?? ""));
-    final extension = extensionFromMime(mimeType!);
-    var metadata = SettableMetadata(
-        contentType: 'image/jpeg',
-        customMetadata: {'picked-file-path': image.path});
+// uploadWeb(MediaInfo mediaInfo, String fileName) async {
+//   try {
+//     String? mimeType = mime(path.basename(mediaInfo.fileName ?? ''));
+//
+//     // html.File mediaFile =
+//     //     new html.File(mediaInfo.data, mediaInfo.fileName, {'type': mimeType});
+//     final String? extension = extensionFromMime(mimeType!);
+//
+//     var metadata = SettableMetadata(
+//       contentType: mimeType,
+//     );
+//
+//     // Reference storageReference =
+//     //     fb.storage().ref(ref).child(fileName + ".$extension");
+//     print("cupertino  " +
+//         metadata.contentType.toString() +
+//         ' ' +
+//         mediaInfo.fileName.toString());
+//     await FirebaseStorage.instance
+//         .ref()
+//         .child('books/$fileName')
+//         .putBlob(mediaInfo.data, metadata);
+//
+//     // Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+//     // print("download url $imageUri");
+//     // return imageUri;
+//   } catch (e) {
+//     // print("File Upload Error $e");
+//     // return null;
+//   }
+// }
 
-    Reference ref = FirebaseStorage.instance.ref().child(
-        "images/$attribute1/images_${DateTime.now().millisecondsSinceEpoch}.${extension}");
-    TaskSnapshot uploadTask = await ref.putBlob(info.data ?? "", metadata);
-    return '';
-  }
+// static Future<String> uploadImageToFirebaseAndShareDownloadUrl(
+//     MediaInfo info, String attribute1, File image) async {
+//   String? mimeType = mime(path.basename(info.fileName ?? ""));
+//   final extension = extensionFromMime(mimeType!);
+//   var metadata = SettableMetadata(
+//       contentType: 'image/jpeg',
+//       customMetadata: {'picked-file-path': image.path});
+//
+//   Reference ref = FirebaseStorage.instance.ref().child(
+//       "images/$attribute1/images_${DateTime.now().millisecondsSinceEpoch}.${extension}");
+//   TaskSnapshot uploadTask = await ref.putBlob(info.data ?? "", metadata);
+//   return '';
+// }
 }

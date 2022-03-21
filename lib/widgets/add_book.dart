@@ -49,13 +49,11 @@ class _AddBookState extends State<AddBook> {
   }
 
   void _submit() async {
-
-    print('reus ' + _imageWeb!.value.toString());
     // getLoc();
     // print("$_bookName+$_authorName+$_description+$_area+$_city+$_mrp");
     final isValid = _formKey.currentState!.validate();
     setState(() {
-      if (_image != null || _imageWeb!.value!.length != 0)
+      if (_imageFromPhone != null || _imageFromWeb!.value!.length != 0)
         imageExists = true;
       else
         imageExists = false;
@@ -84,13 +82,13 @@ class _AddBookState extends State<AddBook> {
       "area": _area,
       "city": _city,
       "dateOfAdvertisement": _dateTime,
-      "image": !kIsWeb ? _image : _imageWeb,
+      "image": !kIsWeb ? _imageFromPhone : _imageFromWeb,
       "latitude": !kIsWeb ? _currentPosition.latitude.toString() : '',
       "longitude": !kIsWeb ? _currentPosition.longitude.toString() : '',
       "ownerEmail":
           await Provider.of<AuthenticationManager>(context, listen: false)
               .getEmail()
-    }, _imageWeb!, context);
+    }, context);
 
     // Future.delayed(Duration(seconds: 2));
     setState(() {
@@ -234,7 +232,9 @@ class _AddBookState extends State<AddBook> {
                                     value: _percent,
                                     onChanged: (value) {
                                       setState(() {
-                                        _percent = value;
+                                        try {
+                                          _percent = value;
+                                        } catch (error) {}
                                       });
                                     },
                                     min: 0,
@@ -283,7 +283,7 @@ class _AddBookState extends State<AddBook> {
                     child: Row(
                       children: [
                         Text('Upload Photo'),
-                        if (_image == null)
+                        if (_imageFromPhone == null)
                           RawMaterialButton(
                             fillColor: Theme.of(context).colorScheme.secondary,
                             child: Icon(
@@ -293,21 +293,18 @@ class _AddBookState extends State<AddBook> {
                             elevation: 8,
                             onPressed: !kIsWeb
                                 ? () {
-                                    getImage(true);
+                                    getImageFromPhone(true);
                                   }
                                 : () async {
                                     // _pickImage();
-                                    _imageWeb!.click();
+                                    _imageFromWeb!.click();
                                     await FirebaseService()
-                                        .uploadToStorage(_imageWeb!);
+                                        .uploadFromWeb(_imageFromWeb!);
                                     await Future.delayed(Duration(seconds: 3));
                                     // _imageWeb!.();
-                                    setState(() {
-                                      _imageWebText = _imageWeb?.value;
-                                      print('inside setstate $_imageWebText');
-                                    });
+                                    setState(() {});
 
-                                    print("${_imageWeb?.value} value");
+                                    print("${_imageFromWeb?.value} value");
                                   },
                             padding: EdgeInsets.all(15),
                             shape: CircleBorder(),
@@ -316,7 +313,7 @@ class _AddBookState extends State<AddBook> {
                     ),
                   ),
                   !kIsWeb
-                      ? _image != null
+                      ? _imageFromPhone != null
                           ? SizedBox(
                               height: MediaQuery.of(context).size.height * 0.3,
                               width: MediaQuery.of(context).size.width,
@@ -336,7 +333,7 @@ class _AddBookState extends State<AddBook> {
                                     child: GestureDetector(
                                       onTap: () {
                                         setState(() {
-                                          _image = null;
+                                          _imageFromPhone = null;
                                         });
                                       },
                                       child: Icon(
@@ -348,7 +345,7 @@ class _AddBookState extends State<AddBook> {
                                 ),
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: FileImage(_image!.absolute),
+                                    image: FileImage(_imageFromPhone!.absolute),
                                   ),
                                 ),
                               ))
@@ -356,7 +353,7 @@ class _AddBookState extends State<AddBook> {
                               child: Text("Uded"),
                             )
                       // : _imageWeb!.value!.length != 0
-                      : _imageWeb!.value!.length != 0
+                      : _imageFromWeb!.value!.length != 0
                           ? Container(
                               margin: EdgeInsets.all(8),
                               // height: MediaQuery.of(context).size.height * 0.25,
@@ -371,7 +368,9 @@ class _AddBookState extends State<AddBook> {
                                       //         width: 400,
                                       //         child: _mediaInfo)
                                       //     : Container(),
-                                      Text(_imageWeb!.value!.split('\\').last),
+                                      Text(_imageFromWeb!.value!
+                                          .split('\\')
+                                          .last),
                                     ],
                                   ),
                                   // Text("Uded"),
@@ -387,7 +386,7 @@ class _AddBookState extends State<AddBook> {
                                       child: GestureDetector(
                                         onTap: () {
                                           setState(() {
-                                            _image = null;
+                                            _imageFromPhone = null;
                                           });
                                         },
                                         child: Icon(
@@ -401,9 +400,7 @@ class _AddBookState extends State<AddBook> {
                               ),
                               decoration: BoxDecoration(),
                             )
-                          : Container(
-                              child: Text('setstate'),
-                            ),
+                          : Container(),
                 ],
               ),
             ),
@@ -512,12 +509,9 @@ class _AddBookState extends State<AddBook> {
   }
 
   // Image Picker
-  File? _image;
-  html.InputElement? _imageWeb =
+  File? _imageFromPhone;
+  html.InputElement? _imageFromWeb =
       html.FileUploadInputElement() as html.InputElement..accept = 'image/*';
-
-  // String? _imageWeb?
-  String? _imageWebText;
 
   // Image? _pickedImage;
   // MediaInfo? _mediaInfo;
@@ -543,7 +537,7 @@ class _AddBookState extends State<AddBook> {
   //   // print(_pickedImages);
   // }
 
-  Future getImage(bool gallery) async {
+  Future getImageFromPhone(bool gallery) async {
     ImagePicker picker = ImagePicker();
     PickedFile pickedFile;
     // Let user select photo from gallery
@@ -565,31 +559,11 @@ class _AddBookState extends State<AddBook> {
       // ignore: unnecessary_null_comparison
       if (pickedFile != null) {
         // _images.add(File(pickedFile.path));
-        if (kIsWeb) {
-          _image = File(pickedFile.path);
-        } else {
-          _image = File(pickedFile.path);
-        }
-        // _image = File(pickedFile.path); // Use if you only need a single picture
+        _imageFromPhone =
+            File(pickedFile.path); // Use if you only need a single picture
       } else {
         print('No image selected.');
       }
-    });
-  }
-
-  uploadToStorage() {
-    print(" uploadtostorage");
-
-    _imageWeb!.onChange.listen((event) {
-      final file = _imageWeb!.files?.first;
-      final reader = html.FileReader();
-      reader.readAsDataUrl(file!);
-      reader.onLoadEnd.listen((event) async {
-        var snapshot =
-            await FirebaseStorage.instance.ref().child('newfile').putBlob(file);
-        String downloadUrl = await snapshot.ref.getDownloadURL();
-        print(downloadUrl + " uploadtostorage");
-      });
     });
   }
 }
