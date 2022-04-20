@@ -374,28 +374,28 @@ class _AddBookState extends State<AddBook> {
                                     ],
                                   ),
                                   // Text("Uded"),
-                                  Align(
-                                    alignment: Alignment.topRight,
-                                    child: Container(
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey,
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _imageFromPhone = null;
-                                          });
-                                        },
-                                        child: Icon(
-                                          Icons.cancel,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  // Align(
+                                  //   alignment: Alignment.topRight,
+                                  //   child: Container(
+                                  //     padding: EdgeInsets.all(10),
+                                  //     decoration: BoxDecoration(
+                                  //       color: Colors.grey,
+                                  //       borderRadius:
+                                  //           BorderRadius.circular(100),
+                                  //     ),
+                                  //     child: GestureDetector(
+                                  //       onTap: () {
+                                  //         setState(() {
+                                  //           _imageFromPhone = null;
+                                  //         });
+                                  //       },
+                                  //       child: Icon(
+                                  //         Icons.cancel,
+                                  //         color: Colors.white,
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                               decoration: BoxDecoration(),
